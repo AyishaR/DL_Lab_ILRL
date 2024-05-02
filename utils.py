@@ -30,24 +30,6 @@ def action_to_id(a):
         return BRAKE  # BRAKE: 4
     return STRAIGHT  # STRAIGHT = 0
 
-def id_to_action_manual(action_id, max_speed=0.8):
-    """
-    this method makes actions continuous.
-    Important: this method only works if you recorded data pressing only one key at a time!
-    """
-    a = np.array([0.0, 0.0, 0.0])
-
-    if action_id == LEFT:
-        return np.array([-0.3, 0.0, 0.01])
-    elif action_id == RIGHT:
-        return np.array([0.3, 0.0, 0.01])
-    elif action_id == ACCELERATE:
-        return np.array([0.0, max_speed, 0.0])
-    elif action_id == BRAKE:
-        return np.array([0.0, 0.0, 0.01])
-    else:
-        return np.array([0.0, 0.0, 0.0])
-
 def id_to_action(action_id, max_speed=0.8):
     """
     this method makes actions continuous.
