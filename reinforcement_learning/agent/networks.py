@@ -7,6 +7,7 @@ class MLP(nn.Module):
     """
     CartPole network
     """
+
     def __init__(self, state_dim, action_dim, hidden_dim=400):
         super(MLP, self).__init__()
         self.fc1 = nn.Linear(state_dim, hidden_dim)
@@ -23,19 +24,22 @@ class CNN(nn.Module):
     """
     CarRacing network
     """
+
     def __init__(self, history_length=0, n_classes=5):
         super(CNN, self).__init__()
 
-        self.c1 = nn.Conv2d(history_length+1, 32, kernel_size=(3,3), stride=1, padding=1)
+        self.c1 = nn.Conv2d(
+            history_length + 1, 32, kernel_size=(3, 3), stride=1, padding=1
+        )
         self.r1 = nn.ReLU()
         self.p1 = nn.MaxPool2d(kernel_size=(2, 2))
- 
-        self.c2 = nn.Conv2d(32, 32, kernel_size=(3,3), stride=1, padding=1)
+
+        self.c2 = nn.Conv2d(32, 32, kernel_size=(3, 3), stride=1, padding=1)
         self.r2 = nn.ReLU()
         self.p2 = nn.MaxPool2d(kernel_size=(2, 2))
- 
+
         self.flat = nn.Flatten()
- 
+
         self.fc3 = nn.Linear(18432, 512)
         self.r3 = nn.ReLU()
 

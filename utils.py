@@ -24,11 +24,12 @@ def action_to_id(a):
         return LEFT  # LEFT: 1
     if all(a == [1.0, 0.0, 0.0]):
         return RIGHT  # RIGHT: 2
-    if a[0]==0.0 and a[2]==0.0 and a[1]>0.0:
+    if a[0] == 0.0 and a[2] == 0.0 and a[1] > 0.0:
         return ACCELERATE  # ACCELERATE: 3
-    if a[0]==0.0 and a[1]==0.0 and a[2]>0.0:
+    if a[0] == 0.0 and a[1] == 0.0 and a[2] > 0.0:
         return BRAKE  # BRAKE: 4
     return STRAIGHT  # STRAIGHT = 0
+
 
 def id_to_action(action_id, max_speed=0.8):
     """

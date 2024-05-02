@@ -14,6 +14,7 @@ from reinforcement_learning.agent.dqn_agent import DQNAgent
 from reinforcement_learning.agent.networks import *
 import pprint
 
+
 def run_episode(
     env,
     agent,
@@ -23,7 +24,7 @@ def run_episode(
     rendering=False,
     max_timesteps=1000,
     history_length=0,
-    acceleration=0.8
+    acceleration=0.8,
 ):
     """
     This methods runs one episode for a gym environment.
@@ -50,9 +51,11 @@ def run_episode(
 
     while True:
         state = torch.tensor(state)
-        action_id = agent.act(state=state, 
-                              deterministic=deterministic,
-                              random_probability = [0.3, 0.2, 0.2, 0.2, 0.1])
+        action_id = agent.act(
+            state=state,
+            deterministic=deterministic,
+            random_probability=[0.3, 0.2, 0.2, 0.2, 0.1],
+        )
         action = id_to_action(action_id, acceleration)
         reward = 0
         for _ in range(skip_frames + 1):
@@ -106,13 +109,13 @@ def train_online(
     tensorboard_ev = Evaluation(
         os.path.join(tensorboard_dir, "train"),
         "Carracing",
-        stats=["evaluation_episodes", "average_reward"]
+        stats=["evaluation_episodes", "average_reward"],
     )
 
     for i in range(num_episodes):
         print("epsiode %d" % i)
 
-        max_timesteps = min(((i//5)+1)*100, 2000)
+        max_timesteps = min(((i // 5) + 1) * 100, 2000)
         print("max timesteps: %d" % max_timesteps)
 
         stats = run_episode(
@@ -124,38 +127,49 @@ def train_online(
             history_length=history_length,
             rendering=False,
             skip_frames=5,
-            acceleration=0.5
+            acceleration=0.5,
         )
         eval_dict_ = {
-                "episode_reward": stats.episode_reward,
-                "straight": stats.get_action_usage(STRAIGHT),
-                "left": stats.get_action_usage(LEFT),
-                "right": stats.get_action_usage(RIGHT),
-                "accel": stats.get_action_usage(ACCELERATE),
-                "brake": stats.get_action_usage(BRAKE),
-            }
+            "episode_reward": stats.episode_reward,
+            "straight": stats.get_action_usage(STRAIGHT),
+            "left": stats.get_action_usage(LEFT),
+            "right": stats.get_action_usage(RIGHT),
+            "accel": stats.get_action_usage(ACCELERATE),
+            "brake": stats.get_action_usage(BRAKE),
+        }
 
         tensorboard.write_episode_data(
             i,
             eval_dict=eval_dict_,
         )
 
-        if i % eval_cycle == 0 or i==num_episodes-1:
+        if i % eval_cycle == 0 or i == num_episodes - 1:
             total_reward = 0
             for j in range(num_eval_episodes):
-                eval_stats = run_episode(env, agent, deterministic=True, do_training=False, history_length=history_length, acceleration=0.5)
+                eval_stats = run_episode(
+                    env,
+                    agent,
+                    deterministic=True,
+                    do_training=False,
+                    history_length=history_length,
+                    acceleration=0.5,
+                )
                 total_reward += eval_stats.episode_reward
             avg_reward = total_reward / num_eval_episodes
-            print("Average reward over", num_eval_episodes, "evaluation episodes:", avg_reward)
+            print(
+                "Average reward over",
+                num_eval_episodes,
+                "evaluation episodes:",
+                avg_reward,
+            )
             # Log average reward to tensorboard or any other logging mechanism
             tensorboard_ev.write_episode_data(
                 i,
                 eval_dict={
                     "evaluation_episodes": num_eval_episodes,
-                    "average_reward": avg_reward
-                }
+                    "average_reward": avg_reward,
+                },
             )
-
 
         # store model.
         if i % eval_cycle == 0 or i == num_episodes - 1:
@@ -163,6 +177,7 @@ def train_online(
 
     tensorboard.close_session()
     tensorboard_ev.close_session()
+
 
 def state_preprocessing(state):
     return rgb2gray(state).reshape(96, 96) / 255.0
@@ -188,5 +203,9 @@ if __name__ == "__main__":
     # dqn.load('models_carracing/cr_dqn_agent_m2_p2.pt')
 
     train_online(
-        env, dqn, num_episodes=200, history_length=history_length, model_dir="./models_carracing"
+        env,
+        dqn,
+        num_episodes=200,
+        history_length=history_length,
+        model_dir="./models_carracing",
     )

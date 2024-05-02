@@ -24,7 +24,7 @@ if __name__ == "__main__":
     t_net = CNN(history_length=history_length, n_classes=num_classes).to(device)
     dqn = DQNAgent(q_net, t_net, num_classes, device)
 
-    dqn.load('models_carracing/cr_dqn_agent_m2_p2.pt')
+    dqn.load("models_carracing/cr_dqn_agent_m2_p2.pt")
 
     n_test_episodes = 15
 
@@ -32,7 +32,14 @@ if __name__ == "__main__":
     for i in range(n_test_episodes):
         print(f"Episode {i}")
         stats = run_episode(
-            env, dqn, deterministic=False, do_training=False, rendering=True, history_length=history_length, skip_frames=5, acceleration=0.2
+            env,
+            dqn,
+            deterministic=False,
+            do_training=False,
+            rendering=True,
+            history_length=history_length,
+            skip_frames=5,
+            acceleration=0.2,
         )
         episode_rewards.append(stats.episode_reward)
 

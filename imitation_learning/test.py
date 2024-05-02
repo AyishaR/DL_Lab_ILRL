@@ -13,10 +13,12 @@ from imitation_learning.agent.bc_agent import BCAgent
 import matplotlib.pyplot as plt
 from utils import *
 
+
 def state_preprocessing(state):
     state = rgb2gray(state)
-    state[85:, :15] = 0.0 # hide reward in the image
+    state[85:, :15] = 0.0  # hide reward in the image
     return state
+
 
 def run_episode(env, agent, rendering=True, max_timesteps=1000):
 
@@ -47,12 +49,12 @@ def run_episode(env, agent, rendering=True, max_timesteps=1000):
         else:
             _, output = agent.predict(state)
             output = output.detach().numpy()
-        
+
         action = id_to_action(output, max_speed=0.1)
-        
+
         next_state, r, done, info = env.step(action)
         episode_reward += r
-        
+
         step += 1
 
         next_state = state_preprocessing(next_state)
@@ -90,18 +92,21 @@ if __name__ == "__main__":
 
         episode_rewards = []
         for i in range(n_test_episodes):
-            episode_reward = run_episode(env, agent, rendering=rendering, max_timesteps=2000)
+            episode_reward = run_episode(
+                env, agent, rendering=rendering, max_timesteps=2000
+            )
             episode_rewards.append(episode_reward)
 
         # save results in a dictionary and write them into a .json file
         results = dict()
-        results['model'] = mname
+        results["model"] = mname
         results["episode_rewards"] = episode_rewards
         results["mean"] = np.array(episode_rewards).mean()
         results["std"] = np.array(episode_rewards).std()
 
-        fname = f"results/results_bc_agent-{history_length}"+"-%s.json" % datetime.now().strftime(
-            "%Y%m%d-%H%M%S"
+        fname = (
+            f"results/results_bc_agent-{history_length}"
+            + "-%s.json" % datetime.now().strftime("%Y%m%d-%H%M%S")
         )
         fh = open(fname, "w")
         json.dump(results, fh)

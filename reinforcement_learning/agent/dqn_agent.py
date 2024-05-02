@@ -66,21 +66,35 @@ class DQNAgent:
         self.replay_buffer.add_transition(state, action, next_state, reward, terminal)
 
         # Sample mini-batch from the replay buffer
-        states, actions, next_states, rewards, dones  = self.replay_buffer.next_batch(self.batch_size)
+        states, actions, next_states, rewards, dones = self.replay_buffer.next_batch(
+            self.batch_size
+        )
 
         try:
-            states_batch = torch.stack(tuple(states),dim=0).to(device=self.device)
+            states_batch = torch.stack(tuple(states), dim=0).to(device=self.device)
         except TypeError:
             states_batch = torch.tensor(tuple(states)).to(device=self.device)
-        actions_batch = torch.tensor(actions.astype(int), dtype=torch.int64, device=self.device)
-        next_states_batch = torch.tensor(next_states.astype(float), dtype=torch.float, device=self.device)
-        rewards_batch = torch.tensor(rewards.astype(float), dtype=torch.float, device=self.device)
-        terminal_batch = torch.tensor(dones.astype(float), dtype=torch.float, device=self.device)
+        actions_batch = torch.tensor(
+            actions.astype(int), dtype=torch.int64, device=self.device
+        )
+        next_states_batch = torch.tensor(
+            next_states.astype(float), dtype=torch.float, device=self.device
+        )
+        rewards_batch = torch.tensor(
+            rewards.astype(float), dtype=torch.float, device=self.device
+        )
+        terminal_batch = torch.tensor(
+            dones.astype(float), dtype=torch.float, device=self.device
+        )
 
         # Compute TD targets and loss
-        Q_values_next = self.Q_target(next_states_batch).max(dim=1)[0].detach()  # Detach to avoid backpropagation
+        Q_values_next = (
+            self.Q_target(next_states_batch).max(dim=1)[0].detach()
+        )  # Detach to avoid backpropagation
         terminal_numerical = terminal_batch.float()
-        td_target = rewards_batch + (1 - terminal_numerical) * self.gamma * Q_values_next
+        td_target = (
+            rewards_batch + (1 - terminal_numerical) * self.gamma * Q_values_next
+        )
         Q_values = self.Q(states_batch)
         td_estimate = Q_values.gather(1, actions_batch.unsqueeze(1)).squeeze(1)
 
@@ -94,7 +108,7 @@ class DQNAgent:
         # Soft update for target network
         soft_update(self.Q_target, self.Q, self.tau)
 
-    def act(self, state, deterministic, random_probability = []):
+    def act(self, state, deterministic, random_probability=[]):
         """
         This method creates an epsilon-greedy policy based on the Q-function approximator and epsilon (probability to select a random action)
         Args:
@@ -107,14 +121,18 @@ class DQNAgent:
         r = np.random.uniform()
         if deterministic or r > self.epsilon:
             # Take greedy action (argmax)
-            Q_values = self.Q(torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0))
+            Q_values = self.Q(
+                torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(
+                    0
+                )
+            )
             action_id = Q_values.max(dim=1)[1].item()
         else:
             # Sample random action
-            if len(random_probability)==0:
+            if len(random_probability) == 0:
                 action_id = np.random.choice(self.num_actions)
             else:
-                action_id = np.random.choice(self.num_actions, p = random_probability)
+                action_id = np.random.choice(self.num_actions, p=random_probability)
 
         return action_id
 

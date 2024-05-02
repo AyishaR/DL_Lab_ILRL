@@ -124,7 +124,7 @@ if __name__ == "__main__":
             env.render()
             if done:
                 break
-        
+
         episode_rewards.append(episode_reward)
 
         if steps > 20000:
